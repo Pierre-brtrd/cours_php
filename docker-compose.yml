@@ -1,0 +1,34 @@
+version: '3.9'
+
+services:
+  db:
+    image: mysql
+    container_name: dataBase
+    restart: always
+    volumes:
+      - db-data:/var/lib/mysql
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+
+
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpMyAdmin
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - 8000:80
+    environment:
+      PMA_HOST: db
+
+  web:
+    build: php
+    container_name: cours_php
+    volumes:
+      - ./app:/app:rw
+    ports:
+      - 8080:80
+
+volumes:
+  db-data:

@@ -1,0 +1,166 @@
+@font-face {
+    font-family: "Foobar";
+    src: url('./font/foobar-pro-cufonfonts-webfont/Foobar\ Pro-Regular.woff') format('woff');
+}
+
+:root {
+    --primary: #95D1CC;
+    --secondary: #22577E;
+    --terciary: #F6F2D4;
+    --box-shadow: 1px 1px 50px -10px rgba(0, 0, 0, 0.71);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--primary);
+    font-weight: 900;
+    margin-bottom: 10px;
+    line-height: 120%;
+    font-family: 'Foobar';
+}
+
+h1 {
+    font-size: 2em;
+}
+
+h2 {
+    font-size: 1.6em;
+}
+
+h3 {
+    font-size: 1.4em;
+}
+
+h4 {
+    font-size: 1.3em;
+}
+
+h5 {
+    font-size: 1em;
+}
+
+h6 {
+    font-size: 0.8em;
+}
+
+p {
+    font-size: 1em;
+    line-height: 120%;
+    margin: 10px 0;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+ul,
+ol {
+    list-style: none;
+    margin-bottom: 0px;
+    display: inline-block;
+}
+
+.container,
+section {
+    width: 80%;
+    max-width: 1140px;
+    margin: auto;
+}
+
+section {
+    margin: 3.5em auto 1em;
+}
+
+.separator {
+    border: none;
+    border-top: 1px solid var(--secondary);
+    border-radius: 5px;
+}
+
+.middle {
+    width: 50%;
+}
+
+header {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    z-index: 999;
+}
+
+.navbar {
+    background-color: var(--primary);
+    height: 50px;
+}
+
+.logo {
+    color: var(--secondary);
+    margin-bottom: 0;
+}
+
+.navbar-content {
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-list {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.navbar-list li:not(:last-child) {
+    margin-right: 10px;
+}
+
+.alert {
+    width: 70%;
+    margin: auto;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.alert-danger {
+    background-color: rgba(184, 72, 72, 0.502);
+    border: 1px solid rgb(164, 21, 21);
+}
+
+.alert-success {
+    background-color: rgba(72, 184, 122, 0.502);
+    border: 1px solid rgb(72, 184, 122);
+}
+
+.hidden {
+    display: none;
+}
+
+footer {
+    width: 100%;
+    background-color: var(--primary);
+    padding: 0.6em;
+    text-align: center;
+}
