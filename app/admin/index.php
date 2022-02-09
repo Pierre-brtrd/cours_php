@@ -55,7 +55,16 @@ include_once('../requetes/features.php');
                             <h2><b>Features</b></h2>
                         </div>
                         <div class="card-btn">
-                            <a class="btn-form" href="./features/liste_features.php">Modifier</a>
+                            <a class="btn-form" href="./features">Modifier</a>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <img src="<? echo $imagePath; ?>banner-hero.jpeg" alt="">
+                        <div class="card-body">
+                            <h2><b>Articles</b></h2>
+                        </div>
+                        <div class="card-btn">
+                            <a class="btn-form" href="./articles">Modifier</a>
                         </div>
                     </div>
                     <div class="card">
@@ -64,7 +73,7 @@ include_once('../requetes/features.php');
                             <h2><b>Users</b></h2>
                         </div>
                         <div class="card-btn">
-                            <a class="btn-form" href="./users/liste_user.php">Modifier</a>
+                            <a class="btn-form" href="./users">Modifier</a>
                         </div>
                     </div>
                 </div>

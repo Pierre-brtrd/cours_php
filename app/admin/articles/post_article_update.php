@@ -7,7 +7,8 @@ include_once('../../requetes/features.php');
 include_once('../../requetes/users.php');
 include_once('../../requetes/articles.php');
 
-if (!empty($_POST['create_nom']) && !empty($_POST['create_desc'])) {
+if (!empty($_POST['create_id']) && !empty($_POST['create_nom']) && !empty($_POST['create_desc'])) {
+    $id = $_POST['create_id'];
     $titre = $_POST['create_nom'];
     $desc = $_POST['create_desc'];
     $date = date('Y-m-d');
@@ -18,10 +19,11 @@ if (!empty($_POST['create_nom']) && !empty($_POST['create_desc'])) {
         }
     }
 
-    $sqlQuery = "INSERT INTO articles(titre, Description, auteur_id, date) VALUE (:nom, :desc, :auteur, :date)";
+    $sqlQuery = "UPDATE articles SET titre= :titre, Description= :desc, auteur_id= :auteur, date= :date WHERE article_id= :id";
     $sqlStatement = $db->prepare($sqlQuery);
     $sqlStatement->execute([
-        'nom' => $titre,
+        'id' => $id,
+        'titre' => $titre,
         'desc' => $desc,
         'auteur' => $auteur,
         'date' => $date,
@@ -42,7 +44,7 @@ if (!empty($_POST['create_nom']) && !empty($_POST['create_desc'])) {
     <link rel="stylesheet" href="<?php echo $stylePath; ?>main.css">
     <link rel="stylesheet" href="<?php echo $stylePath; ?>index.css">
     <link rel="shortcut icon" href="/assets/favicon/favicon.ico" type="image/x-icon">
-    <title>Ajout article - Cours PHP</title>
+    <title>Modification article - Cours PHP</title>
 </head>
 
 <body>
@@ -65,7 +67,7 @@ if (!empty($_POST['create_nom']) && !empty($_POST['create_desc'])) {
         <?php else : ?>
 
             <section>
-                <h1>Article ajouté</h1>
+                <h1>Article modifié</h1>
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">Rappel des informations</h5>

@@ -63,6 +63,7 @@ p {
     font-size: 1em;
     line-height: 120%;
     margin: 10px 0;
+    word-break: break-word;
 }
 
 a {

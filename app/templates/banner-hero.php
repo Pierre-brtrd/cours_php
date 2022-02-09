@@ -6,7 +6,7 @@
     </div>
     <div class="btn-scroll">
         <a href="#features">
-            <? include_once($imagePath . 'arrow-down.svg'); ?>
+            <? include_once('/app/' . $imagePath . 'arrow-down.svg'); ?>
         </a>
     </div>
 </div>

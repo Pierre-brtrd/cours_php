@@ -20,7 +20,7 @@ if (isset($_POST['id']) && !empty($_POST['id'])) {
     $errorMessageDelete = 'Il y a une erreur';
 }
 
-header('refresh:2;url="' . $rootURL . '/admin/users/liste_features.php"');
+header('refresh:2;url="' . $rootURL . '/admin/users"');
 
 ?>
 

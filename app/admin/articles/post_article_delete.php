@@ -3,14 +3,15 @@ session_start();
 
 include_once('../../config/mysql.php');
 include_once('../../config/variables.php');
-include_once('../../requetes/users.php');
 include_once('../../requetes/features.php');
+include_once('../../requetes/users.php');
+include_once('../../requetes/articles.php');
 
-if (isset($_POST['id']) && !empty($_POST['id'])) {
+if (!empty($_POST['create_id'])) {
 
-    $id = $_POST['id'];
+    $id = $_POST['create_id'];
 
-    $sqlQuery = 'DELETE FROM features WHERE id= :id';
+    $sqlQuery = 'DELETE FROM articles WHERE article_id= :id';
 
     $deleteFeature = $db->prepare($sqlQuery);
 
@@ -21,7 +22,7 @@ if (isset($_POST['id']) && !empty($_POST['id'])) {
     $errorMessageDelete = 'Il y a une erreur';
 }
 
-header('refresh:1;url="' . $rootURL . '/admin/features"');
+header('refresh:1;url="' . $rootURL . '/admin/articles"');
 
 ?>
 
@@ -35,7 +36,7 @@ header('refresh:1;url="' . $rootURL . '/admin/features"');
     <link rel="stylesheet" href="<?php echo $stylePath; ?>main.css">
     <link rel="stylesheet" href="<?php echo $stylePath; ?>index.css">
     <link rel="shortcut icon" href="/assets/favicon/favicon.ico" type="image/x-icon">
-    <title>Suppression feature - Cours PHP</title>
+    <title>Suppression article - Cours PHP</title>
 </head>
 
 <body>
@@ -43,26 +44,25 @@ header('refresh:1;url="' . $rootURL . '/admin/features"');
     <?php include($templatePath . 'header.php'); ?>
     <?php include($templatePath . 'login.php'); ?>
 
-    <main>
-        <?php if (isset($_SESSION['LOGGED_USER'])) : ?>
+    <?php if (isset($_SESSION['LOGGED_USER'])) : ?>
+        <?php if (isset($errorMessageDelete)) : ?>
             <section>
-                <?php if (isset($errorMessageDelete)) : ?>
 
-                    <div class="alert alert-danger">
-                        <h5 class="card-title">Erreur dans le formulaire</h5>
-                        <p><?php echo ($errorMessageDelete); ?></p>
-                    </div>
+                <div class="alert alert-danger" role="alert">
+                    <p class="card-title"><b><? echo $errorMessageDelete; ?></b></p>
+                </div>
 
-                <?php else : ?>
+            </section>
 
-                    <div class="alert alert-success">
-                        <h5 class="card-title">Feature supprimer</h5>
-                    </div>
-
-                <?php endif; ?>
+        <?php else : ?>
+            <section>
+                <div class="alert alert-success">
+                    <p class="card-title"><b>Article supprimé</b></p>
+                </div>
             </section>
         <? endif; ?>
-    </main>
+
+    <? endif; ?>
 
 </body>
 

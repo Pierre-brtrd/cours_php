@@ -49,8 +49,8 @@ include_once('../../requetes/articles.php');
                                 <p class="card-text"><b><em>Auteur</em></b> : <? echo $article['nom']; ?></p>
                             </div>
                             <div class="card-btn">
-                                <a class="alert-success" href="<?php echo $rootURL . "/admin/articles/update-article.php?id=" . $article['article_id']; ?>">Modifier</a>
-                                <a class="alert-danger" href="<?php echo $rootURL . "/admin/articles/delete-article.php?id=" . $article['article_id']; ?>">Supprimer</a>
+                                <a class="alert-success" href="<?php echo $rootURL . "/admin/articles/update.php?id=" . $article['article_id']; ?>">Modifier</a>
+                                <a class="alert-danger" href="<?php echo $rootURL . "/admin/articles/delete.php?id=" . $article['article_id']; ?>">Supprimer</a>
                             </div>
                         </div>
                     <? endforeach; ?>
@@ -58,7 +58,7 @@ include_once('../../requetes/articles.php');
             </section>
 
             <section>
-                <a class="btn-form" href="<?php echo $rootURL; ?>/admin/articles/add-article.php">Ajouter un article</a>
+                <a class="btn-form" href="<?php echo $rootURL; ?>/admin/articles/create.php">Ajouter un article</a>
             </section>
 
         <? endif; ?>

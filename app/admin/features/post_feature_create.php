@@ -6,10 +6,12 @@ include_once('../../config/variables.php');
 include_once('../../requetes/features.php');
 include_once('../../requetes/users.php');
 
-$name = $_POST['create_nom'];
-$desc = $_POST['create_desc'];
+if (isset($_POST['create_nom']) && isset($_POST['create_desc'])) {
+    $name = $_POST['create_nom'];
+    $desc = $_POST['create_desc'];
+}
 
-if (!empty($name) && !empty($name)) {
+if (!empty($name) && !empty($desc)) {
     if (isset($_FILES['create_image']) && $_FILES['create_image']['error'] == 0) {
         if ($_FILES['create_image']['size'] <= 1000000) {
             $fileInfo = pathinfo($_FILES['create_image']['name']);

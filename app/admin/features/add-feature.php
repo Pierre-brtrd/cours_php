@@ -32,7 +32,7 @@ include_once('../../requetes/features.php');
         <?php if (isset($_SESSION['LOGGED_USER'])) : ?>
 
             <section>
-                <h1>Page de création d'un utilisateur</h1>
+                <h1>Page de création d'une feature</h1>
                 <form class="form-user" action="post_feature_create.php" method="POST" enctype="multipart/form-data">
                     <div class="form-login-input">
                         <div class="input-group">
