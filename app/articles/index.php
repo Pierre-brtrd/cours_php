@@ -1,26 +1,40 @@
 <?php
 session_start();
 
-include_once('config/mysql.php');
-include_once('config/variables.php');
-include_once('requetes/users.php');
-include_once('requetes/userActif.php');
-include_once('requetes/articles.php');
+include_once('../config/mysql.php');
+include_once('../config/variables.php');
+include_once('../requetes/users.php');
+include_once('../requetes/userActif.php');
+include_once('../requetes/articles.php');
 
-if (isset($_GET['id'])) {
+if (isset($_GET['id']) || isset($_GET['auteur'])) {
     foreach ($users as $user => $userInfo) {
-        if (in_array($_GET['id'], $users[$user])) {
-            $searchId = true;
-            $auteur = $userInfo['nom'];
+        if (isset($_GET['id'])) {
+            if (in_array($_GET['id'], $users[$user])) {
+                $searchId = true;
+                $auteur = $userInfo['nom'];
+                $id = $_GET['id'];
+            }
+        } elseif (isset($_GET['auteur'])) {
+            if (in_array($_GET['auteur'], $users[$user])) {
+                $searchId = true;
+                $auteur = $userInfo['nom'];
+                $id = $userInfo['id'];
+            }
         }
     }
 
     if (isset($searchId)) {
-        $sqlQuery = "SELECT u.nom, a.titre, a.description, a.date FROM utilisateurs u INNER JOIN articles a ON u.id = a.auteur_id WHERE u.id = :id";
+        $sqlQuery = "SELECT u.nom, a.titre, a.description, a.date 
+        FROM utilisateurs u 
+        INNER JOIN articles a 
+        ON u.id = a.auteur_id 
+        WHERE u.id = :id 
+        ORDER BY a.titre";
 
         $sqlQueryStatement = $db->prepare($sqlQuery);
         $sqlQueryStatement->execute([
-            'id' => $_GET['id'],
+            'id' => $id,
         ]);
 
         $articlesUser = $sqlQueryStatement->fetchAll();
@@ -28,7 +42,7 @@ if (isset($_GET['id'])) {
         $errorMessageId = "Il faut un auteur valide";
     }
 } else {
-    $errorMessageId = "Il faut un auteur valide";
+    $errorMessageId = true;
 }
 
 ?>
@@ -60,9 +74,22 @@ if (isset($_GET['id'])) {
         <?php if (isset($_SESSION['LOGGED_USER'])) : ?>
             <section>
                 <? if (isset($errorMessageId)) : ?>
-                    <div class="alert alert-danger">
-                        <h1><? echo $errorMessageId; ?>
-                    </div>
+                    <h1>Page de présentation des articles</h1>
+                    <form class="form-user form-article-auteur" action="article.php" method="GET">
+                        <div class="form-login-input form-article">
+                            <p>Il faut d'abord sélectionner un auteur pour afficher ses articles</p>
+                            <div class="input-group">
+                                <label for="auteur">Auteur :</label>
+                                <input type="text" name="auteur" list="auteur_list">
+                                <datalist id="auteur_list">
+                                    <? foreach ($users as $user) : ?>
+                                        <option value="<? echo $user['nom']; ?>">
+                                        <? endforeach; ?>
+                                </datalist>
+                            </div>
+                        </div>
+                        <button class="btn-form" type="submit">Envoyer</button>
+                    </form>
                 <? else : ?>
                     <article>
                         <h1>Page des articles de <? echo $auteur; ?></h1>

@@ -8,8 +8,11 @@
                 <? if (isset($_SESSION["LOGGED_USER"])) : ?>
                     <li><a href="<?php echo $rootURL; ?>/admin">Admin</a></li>
                 <? endif; ?>
-                <li><a href="<? echo $rootURL; ?>/article.php">Article</a></li>
-                <li><a href="/templates/logout.php">Déconnexion</a></li>
+                <li><a href="<? echo $rootURL; ?>/articles">Article</a></li>
+                <? if (isset($_SESSION["LOGGED_USER"])) : ?>
+                    <li><a href="/templates/logout.php">Déconnexion</a></li>
+                <? endif; ?>
+
             </ul>
         </div>
     </nav>

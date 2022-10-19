@@ -2,6 +2,8 @@
 session_start();
 
 use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
 include("../../config/variables.php");
 
@@ -16,32 +18,31 @@ if (isset($_POST['nom']) && isset($_POST['email']) && isset($_POST['sujet']) && 
     require_once "PHPMailer/SMTP.php";
     require_once "PHPMailer/Exception.php";
 
-    $mail = new PHPmailer();
+    $mail = new PHPmailer(true);
 
-    // SMTP settings
-    $mail->isSMTP();
-    $mail->Host = "smtp.gmail.com";
-    $mail->SMTPAuth = true;
-    $mail->Username = "pierre.brtrd@gmail.com";
-    $mail->Password = "Pierre1997-05";
-    $mail->Port = 465;
-    $mail->SMTPSecure = 'ssl';
+    try {
 
-    // EMAIL settings
-    $mail->isHTML(true);
-    $mail->setFrom($email, 'Contact application PHP');
-    $mail->addAddress("pierre.brtrd@gmail.com");
-    $mail->addReplyTo($email, $nom);
-    $mail->Subject = ("Nouveau message : " . $sujet);
-    $mail->Body = $message . "<br/>Email : " . $email;
+        // SMTP settings
+        $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+        $mail->isSMTP();
+        $mail->Host = "smtp.gmail.com";
+        $mail->SMTPAuth = true;
+        $mail->Username = "pierre.brtrd@gmail.com";
+        $mail->Password = "Pierre1997-05";
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        $mail->Port = 465;
 
-    if ($mail->send()) {
-        $_SESSION['status_email'] = "Success";
-        $_SESSION['response_email'] = "Email envoyé.";
-        header('Location:' . $rootURL . "#contact");
-    } else {
-        $_SESSION['status_email'] = "Errror";
-        $_SESSION['response_email'] = "Erreur, votre message ne s'est pas envoyé" . $mail->ErrorInfo;
-        header('Location:' . $rootURL . "#contact");
+        // EMAIL settings
+        $mail->isHTML(true);
+        $mail->setFrom($email, 'Contact application PHP');
+        $mail->addAddress("pierre.brtrd@gmail.com");
+        $mail->addReplyTo($email, $nom);
+        $mail->Subject = ("Nouveau message : " . $sujet);
+        $mail->Body = $message . "<br/>Email : " . $email;
+
+        $mail->send();
+        echo 'Message has been sent';
+    } catch (Exception $e) {
+        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
     }
 }

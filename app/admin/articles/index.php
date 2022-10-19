@@ -7,6 +7,17 @@ include_once('../../requetes/users.php');
 include_once('../../requetes/features.php');
 include_once('../../requetes/articles.php');
 
+if (isset($_SESSION['LOGGED_USER'])) {
+    $sqlArticleInterneSearchAuteur = "SELECT a.article_id, u.nom, a.titre, a.description, a.date FROM utilisateurs u INNER JOIN articles a ON u.id = a.auteur_id WHERE u.nom = :nom";
+
+    $sqlQueryStatement = $db->prepare($sqlArticleInterneSearchAuteur);
+    $sqlQueryStatement->execute([
+        'nom' => $_SESSION['LOGGED_USER'],
+    ]);
+
+    $articles = $sqlQueryStatement->fetchAll();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -34,12 +45,12 @@ include_once('../../requetes/articles.php');
                 <h1>Liste des articles</h1>
                 <hr class="separator middle" />
                 <div class="liste-users liste-users-admin">
-                    <? foreach ($articles_Auteurs_id as $article) : ?>
+                    <? foreach ($articles as $article) : ?>
                         <?
-                        if (strlen($article['Description']) < 150) {
-                            $description = $article['Description'];
+                        if (strlen($article['description']) < 150) {
+                            $description = $article['description'];
                         } else {
-                            $description = substr($article['Description'], 0, strpos($article['Description'], ' ', 150)) . "...";
+                            $description = substr($article['description'], 0, strpos($article['Description'], ' ', 150)) . "...";
                         }
                         ?>
                         <div class="card">

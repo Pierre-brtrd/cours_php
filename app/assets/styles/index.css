@@ -360,8 +360,17 @@
     margin-bottom: 1em;
 }
 
+.form-article-auteur {
+    border-radius: 8px;
+    padding: 1em;
+    border: solid 1px var(--secondary);
+    width: 50%;
+    text-align: center;
+    margin: auto;
+}
+
 .form-article {
-    justify-content: flex-start;
+    justify-content: center;
 }
 
 .tox-tinymce {

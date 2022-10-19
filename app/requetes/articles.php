@@ -34,9 +34,9 @@ $sqlQueryStatement->execute();
 $auteurs_Articles = $sqlQueryStatement->fetchAll();
 
 // Jointure Externe RIGHT JOIN
-$sqlQueryArticleExterne = "SELECT u.nom, a.article_id, a.titre, a.Description FROM utilisateurs u RIGHT JOIN articles a ON u.id = a.auteur_id";
+// $sqlQueryArticleExterne = "SELECT u.nom, a.article_id, a.titre, a.Description FROM utilisateurs u RIGHT JOIN articles a ON u.id = a.auteur_id";
 
-$sqlQueryStatement = $db->prepare($sqlQueryArticleExterne);
-$sqlQueryStatement->execute();
+// $sqlQueryStatement = $db->prepare($sqlQueryArticleExterne);
+// $sqlQueryStatement->execute();
 
-$articles_Auteurs_id = $sqlQueryStatement->fetchAll();
+// $articles_Auteurs_id = $sqlQueryStatement->fetchAll();
