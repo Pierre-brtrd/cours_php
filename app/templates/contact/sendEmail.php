@@ -5,9 +5,14 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-include("../../config/variables.php");
+include('/app/config/variables.php');
 
-if (isset($_POST['nom']) && isset($_POST['email']) && isset($_POST['sujet']) && isset($_POST['message'])) {
+if (
+    !empty($_POST['nom'])
+    && !empty($_POST['email'])
+    && !empty($_POST['sujet'])
+    && !empty($_POST['message'])
+) {
 
     $nom = $_POST['nom'];
     $email = $_POST['email'];
@@ -18,31 +23,41 @@ if (isset($_POST['nom']) && isset($_POST['email']) && isset($_POST['sujet']) && 
     require_once "PHPMailer/SMTP.php";
     require_once "PHPMailer/Exception.php";
 
-    $mail = new PHPmailer(true);
+    $mail = new PHPMailer();
 
     try {
 
-        // SMTP settings
-        $mail->SMTPDebug = SMTP::DEBUG_SERVER;
+        // SMTP Settings
+        //$mail->SMTPDebug = SMTP::DEBUG_SERVER;
         $mail->isSMTP();
         $mail->Host = "smtp.gmail.com";
         $mail->SMTPAuth = true;
-        $mail->Username = "pierre.brtrd@gmail.com";
-        $mail->Password = "Pierre1997-05";
+        $mail->Username = "bove55414@gmail.com";
+        $mail->Password = "testSio2022!";
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
         $mail->Port = 465;
 
-        // EMAIL settings
+        // Email settings
         $mail->isHTML(true);
-        $mail->setFrom($email, 'Contact application PHP');
-        $mail->addAddress("pierre.brtrd@gmail.com");
+        $mail->setFrom($email, "Contact App PHP");
+        $mail->addAddress('bove55414@gmail.com');
         $mail->addReplyTo($email, $nom);
-        $mail->Subject = ("Nouveau message : " . $sujet);
-        $mail->Body = $message . "<br/>Email : " . $email;
+        $mail->Subject = "Nouveau message : " . $sujet;
+        $mail->Body = $message . "<br> Email : " . $email . "<br> Nom : " . $nom;
 
         $mail->send();
-        echo 'Message has been sent';
+
+        $_SESSION['status_email'] = "Success";
+        $_SESSION['response_email'] = "Votre mail a bien été envoyé.";
+
+        header('Location:' . $rootUrl . "#contact");
     } catch (Exception $e) {
-        echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
+        $_SESSION['status_email'] = "Error";
+        $_SESSION['response_email'] = "Le message n'a pas été envoyé : " . $mail->ErrorInfo;
+        header('Location:' . $rootUrl . "#contact");
     }
+} else {
+    $_SESSION['status_email'] = "Errer";
+    $_SESSION['response_email'] = "Veuillez soumettre le formulaire de contact";
+    header('Location:' . $rootUrl . "#contact");
 }

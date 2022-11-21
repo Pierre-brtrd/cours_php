@@ -1,27 +1,25 @@
 <?php
 session_start();
 
-include_once('/app/config/variables.php');
-include_once($rootPath . 'requests/articles.php');
+include("/app/config/variables.php");
+include($rootPath . 'requests/features.php');
 
 if (!isset($_SESSION['LOGGED_USER']) || !in_array('ROLE_ADMIN', $_SESSION['LOGGED_USER']['roles'])) {
-    $_SESSION['redirect'] = $_SERVER['PHP_SELF'];
+    $_SESSION['redirect'] = $_SERVER['REQUEST_URI'];
 
-    header("Location:$rootUrl/login.php", false);
+    header("Location:$rootUrl/login.php");
 }
 
 // Validation du form
 if (
-    !empty($_POST['titre'])
-    && !empty($_POST['description'])
+    !empty($_POST['name'])
 ) {
     $token = filter_input(INPUT_POST, 'token', FILTER_DEFAULT);
 
-    if (!$token || !hash_equals($_SESSION['token'], $token)) {
-        $errorMessage = "Une erreur est survenue, token invalid";
+    if (!$token || $token !== $_SESSION['token']) {
+        $errorMessage = 'Une erreur est survenue, token invalide';
     } else {
-        $titre = filter_input(INPUT_POST, 'titre', FILTER_SANITIZE_SPECIAL_CHARS);
-        $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_SPECIAL_CHARS);
+        $titre = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS);
 
         // On vérifie s'il y a une image d'upload et qu'il n'y a pas d'erreur
         if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
@@ -36,7 +34,7 @@ if (
                     // Déplacer le fichier dans le bon dossier
                     $imageUploadName = str_replace(' ', '-', $fileInfo['filename']) . (new DateTime())->format('Y-m-d_H:i:s') . '.' . $fileInfo['extension'];
 
-                    move_uploaded_file($_FILES['image']['tmp_name'], '/app/uploads/articles/' . $imageUploadName);
+                    move_uploaded_file($_FILES['image']['tmp_name'], '/app/uploads/features/' . $imageUploadName);
                 } else {
                     $errorMessage = 'Fichier invalide, veuillez télécharger un fichier de type image';
                 }
@@ -45,12 +43,12 @@ if (
             }
         }
 
-        if (addArticle($titre, $description, date('Y-m-d'), $_SESSION['LOGGED_USER']['id'], isset($imageUploadName) ? $imageUploadName : null)) {
-            $_SESSION['message']['success'] = "Article created successfully";
+        if (addFeature($titre, isset($imageUploadName) ? $imageUploadName : null)) {
+            $_SESSION['message']['success'] = "Feature created successfully";
 
-            header("Location:$rootUrl/admin/articles");
+            header("Location:$rootUrl/admin/features");
         } else {
-            $errorMessage = "Une erreur est survenue, veuillez réessayer";
+            $errorMessage = isset($errorMessage) ? $errorMessage : "Une erreur est survenue, veuillez réessayer";
         }
     }
 } else {
@@ -65,18 +63,18 @@ if (
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="<?php echo $stylePath; ?>main.css">
-    <link rel="stylesheet" href="<?php echo $stylePath; ?>articles.css">
-    <link rel="shortcut icon" href="/assets/favicon/favicon.ico" type="image/x-icon">
-    <title>Créer article - Cours PHP</title>
+    <link rel="stylesheet" href="<?= $stylePath; ?>main.css">
+    <link rel="stylesheet" href="<?= $stylePath; ?>index.css">
+    <link rel="shortcut icon" href="../../assets/favicon/favicon.ico" type="image/x-icon">
+    <title>Création feature - Cours PHP</title>
 </head>
 
 <body>
-    <?php include($templatePath . 'header.php'); ?>
+    <? include($templatePath . 'header.php') ?>
     <main>
         <section>
             <div class="form-content">
-                <h1>Création d'un article</h1>
+                <h1>Création d'une feature</h1>
                 <?php if (isset($errorMessage)) : ?>
                     <div class="alert alert-danger">
                         <p><?= $errorMessage; ?></p>
@@ -85,8 +83,8 @@ if (
                 <form action="<?= $_SERVER['REQUEST_URI']; ?>" method="POST" enctype="multipart/form-data">
                     <div class="form-row">
                         <div class="input-group">
-                            <label for="titre">Titre:</label>
-                            <input type="text" name="titre" placeholder="Un super titre" required>
+                            <label for="name">Titre:</label>
+                            <input type="text" name="name" placeholder="Nom de la feature" required>
                         </div>
                     </div>
                     <div class="form-row">
@@ -95,19 +93,13 @@ if (
                             <input type="file" name="image">
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="input-group">
-                            <label for="description">Description:</label>
-                            <textarea name="description" id="" cols="30" rows="7" required placeholder="Contenu de votre article"></textarea>
-                        </div>
-                    </div>
                     <input type="hidden" name="token" value="<?= $_SESSION['token'] ?>">
                     <button type="submit" class="btn btn-primary">Créer</button>
                 </form>
             </div>
         </section>
     </main>
-    <?php include($templatePath . 'footer.php'); ?>
+    <? include($templatePath . 'footer.php') ?>
 </body>
 
 </html>

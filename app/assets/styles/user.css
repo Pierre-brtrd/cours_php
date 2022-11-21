@@ -1,0 +1,45 @@
+.list-users {
+    margin: 2em 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1em;
+}
+
+.list-users-front {
+    margin: 2em 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1em;
+}
+
+.card-user, 
+.card-user .card-user-title h2 {
+    transition: all .4s ease-in-out;
+}
+
+.card-user:hover {
+    background: var(--primary);
+    color: whitesmoke;
+    transform: translateY(-3px);
+}
+
+.card-user-title {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+}
+
+.card-user:hover .card-user-title h2{
+   color: var(--secondary);
+}
+
+.card-user-img {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.card-user-img img {
+    width: 100%;
+}

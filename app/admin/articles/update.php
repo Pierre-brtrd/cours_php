@@ -1,32 +1,78 @@
 <?php
 session_start();
 
-include_once('../../config/mysql.php');
-include_once('../../config/variables.php');
-include_once('../../requetes/users.php');
-include_once('../../requetes/features.php');
-include_once('../../requetes/articles.php');
+include_once('/app/config/variables.php');
+include_once($rootPath . 'requests/articles.php');
+include_once($rootPath . 'requests/users.php');
 
-if (!empty($_GET['id'])) {
-    foreach ($articles as $article => $articleInfo) {
-        if (in_array($_GET['id'], $articles[$article])) {
-            $searchId = true;
-        }
-    }
+if (!isset($_SESSION['LOGGED_USER']) || !in_array('ROLE_ADMIN', $_SESSION['LOGGED_USER']['roles'])) {
+    $_SESSION['redirect'] = $_SERVER['PHP_SELF'];
+
+    header("Location:$rootUrl/login.php", false);
 }
 
-if (isset($searchId)) {
-    $id = $_GET['id'];
+$article = findArticleById(isset($_GET['id']) ? (int) $_GET['id'] : 0);
 
-    $sqlQuery = "SELECT * FROM articles WHERE article_id= :id";
-    $sqlStatement = $db->prepare($sqlQuery);
-    $sqlStatement->execute([
-        'id' => $id,
-    ]);
+if (!$article) {
+    $_SESSION['message']['error'] = "Article not found";
 
-    $articleUpdate = $sqlStatement->fetch(PDO::FETCH_ASSOC);
+    header("Location:$rootUrl/admin/articles");
+}
+
+// Validation du form
+if (
+    !empty($_POST['titre'])
+    && !empty($_POST['description'])
+    && !empty($_POST['auteur'])
+) {
+    $token = filter_input(INPUT_POST, 'token', FILTER_DEFAULT);
+
+    if (!$token || !hash_equals($_SESSION['token'], $token)) {
+        $errorMessage = "Une erreur est survenue, token invalid";
+    } else {
+        $titre = filter_input(INPUT_POST, 'titre', FILTER_SANITIZE_SPECIAL_CHARS);
+        $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_SPECIAL_CHARS);
+        $auteur = filter_input(INPUT_POST, 'auteur', FILTER_SANITIZE_NUMBER_INT);
+
+        // On vérifie s'il y a une image d'upload et qu'il n'y a pas d'erreur
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
+            // On vérifie la taille du fichier
+            if ($_FILES['image']['size'] <= 8000000) {
+                // On vérifie l'extension du fichier
+                $fileInfo = pathinfo($_FILES['image']['name']);
+                $extension = $fileInfo['extension'];
+                $extensionAllowed = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+
+                if (in_array($extension, $extensionAllowed)) {
+                    // Déplacer le fichier dans le bon dossier
+                    $imageUploadName = str_replace(' ', '-', $fileInfo['filename']) . (new DateTime())->format('Y-m-d_H:i:s') . '.' . $fileInfo['extension'];
+
+                    if ($article['image']) {
+                        $imagePath = "/app/uploads/articles/$article[image]";
+                        if (file_exists($imagePath)) {
+                            unlink($imagePath);
+                        }
+                    }
+
+                    move_uploaded_file($_FILES['image']['tmp_name'], '/app/uploads/articles/' . $imageUploadName);
+                } else {
+                    $errorMessage = 'Fichier invalide, veuillez télécharger un fichier de type image';
+                }
+            } else {
+                $errorMessage = "Fichier trop volumineux, la limite est de 8M";
+            }
+        }
+
+        if (updateArticle($article['id'], $titre, $description, $auteur, isset($imageUploadName) ? $imageUploadName : null)) {
+            $_SESSION['message']['success'] = "Article updated successfully";
+
+            header("Location:$rootUrl/admin/articles");
+        } else {
+            $errorMessage = "Une erreur est survenue, veuillez réessayer";
+        }
+    }
 } else {
-    $errorMessageId = "Erreur, il faut un id valide";
+    $_SESSION['token'] = bin2hex(random_bytes(35));
 }
 
 ?>
@@ -38,72 +84,65 @@ if (isset($searchId)) {
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="<?php echo $stylePath; ?>main.css">
-    <link rel="stylesheet" href="<?php echo $stylePath; ?>index.css">
+    <link rel="stylesheet" href="<?= $stylePath; ?>main.css">
     <link rel="shortcut icon" href="/assets/favicon/favicon.ico" type="image/x-icon">
-    <script src="https://cdn.tiny.cloud/1/vp15111dywf4y9mun2o85rzowycoep4c6i6gat3ufcg30427/tinymce/5/tinymce.min.js" sameSite=None referrerpolicy="origin"></script>
-    <script>
-        tinymce.init({
-            selector: 'textarea',
-            plugins: 'a11ychecker advcode casechange export formatpainter linkchecker autolink lists checklist media mediaembed pageembed permanentpen powerpaste table advtable tinycomments tinymcespellchecker',
-            toolbar: 'a11ycheck addcomment showcomments casechange checklist code export formatpainter pageembed permanentpen table',
-            toolbar_mode: 'floating',
-            tinycomments_mode: 'embedded',
-            tinycomments_author: 'Author name',
-        });
-    </script>
     <title>Modifier article - Cours PHP</title>
 </head>
 
 <body>
-
     <?php include($templatePath . 'header.php'); ?>
-
     <main>
         <section>
-            <?php include($templatePath . 'login.php'); ?>
-        </section>
-        <?php if (isset($_SESSION['LOGGED_USER'])) : ?>
-
-            <? if (isset($errorMessageId)) : ?>
-                <section>
+            <div class="form-content">
+                <h1>Création d'un article</h1>
+                <?php if (isset($errorMessage)) : ?>
                     <div class="alert alert-danger">
-                        <p><? echo $errorMessageId; ?></p>
+                        <p><?= $errorMessage; ?></p>
                     </div>
-                </section>
-            <? else : ?>
-                <section>
-                    <h1>Page de modification de l'article</h1>
-                    <form class="form-user" action="post_article_update.php" method="POST">
-                        <div class="form-login-input form-article">
-                            <div class="hidden">
-                                <input type="text" name="create_id" value="<? echo $articleUpdate['article_id']; ?>">
-                            </div>
-                            <div class="input-group">
-                                <label for="create_nom">Titre :</label>
-                                <input type="text" name="create_nom" value="<? echo $articleUpdate['titre']; ?>" placeholder="Un super titre...">
-                            </div>
-                            <div class="input-group">
-                                <label for="create_auteur">Auteur :</label>
-                                <input type="text" name="create_auteur" list="auteur_list">
-                                <datalist id="auteur_list">
-                                    <? foreach ($users as $user) : ?>
-                                        <option value="<? echo $user['nom']; ?>">
-                                        <? endforeach; ?>
-                                </datalist>
-                            </div>
-                            <div class="input-group input-editor">
-                                <label for="create_desc">Contenu :</label>
-                                <textarea class="text-editor" id="desctextarea" name="create_desc" placeholder="Description..." rows="5" cols="50"><? echo $articleUpdate['Description']; ?></textarea>
+                <?php endif; ?>
+                <form action="<?= $_SERVER['REQUEST_URI']; ?>" method="POST" enctype="multipart/form-data">
+                    <?php if (!empty($article['image'])) : ?>
+                        <div class="form-row">
+                            <div class="form-img">
+                                <img src="/uploads/articles/<?= $article['image'] ?>" alt="<?= strip_tags(html_entity_decode($article['titre'])); ?>">
                             </div>
                         </div>
-                        <button class="btn-form" type="submit">Envoyer</button>
-                    </form>
-                </section>
-            <?php endif; ?>
-        <?php endif; ?>
+                    <?php endif; ?>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="titre">Titre:</label>
+                            <input type="text" name="titre" placeholder="Un super titre" required value="<?= strip_tags(html_entity_decode($article['titre'])); ?>">
+                        </div>
+                        <div class="input-group">
+                            <label for="auteur">Auteur :</label>
+                            <select type="text" name="auteur" list="auteur_list" placeholder="Sélectionner un auteur">
+                                <? foreach (findAllUsers() as $user) : ?>
+                                    <option value="<?= $user['id']; ?>" <?= ($user['id'] === $article['user_id']) ? 'selected' : '' ?>><?= "$user[nom] $user[prenom]"; ?></option>
+                                <? endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="image">Image:</label>
+                            <input type="file" name="image">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label for="description">Description:</label>
+                            <textarea name="description" id="" cols="50" rows="7" required placeholder="Contenu de votre article">
+                            <?= html_entity_decode($article['description']); ?>
+                            </textarea>
+                        </div>
+                    </div>
+                    <input type="hidden" name="token" value="<?= $_SESSION['token'] ?>">
+                    <button type="submit" class="btn btn-primary">Modifier</button>
+                </form>
+            </div>
+            <a href="<?= "$rootUrl/admin/articles"; ?>" class="btn btn-success">Retour à la liste</a>
+        </section>
     </main>
-
     <?php include($templatePath . 'footer.php'); ?>
 </body>
 

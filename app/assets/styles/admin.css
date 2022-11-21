@@ -1,0 +1,53 @@
+/**********************  BANNER   *******************/
+.banner {
+    background: center / cover url(../images/banner-admin.jpeg);
+    height: calc(100vh - 50px);
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.banner-title {
+    max-width: 50%;
+    margin-left: 4em;
+    background: rgba(255, 255, 255, 0.4);
+    padding: 2em;
+    border-radius: 16px;
+    backdrop-filter: blur(5px);
+}
+
+.banner-title h1 {
+    font-size: 40px;
+}
+
+.btn-scroll {
+    position: absolute;
+    display: block;
+    bottom: 2%;
+    left: 50%;
+    font-size: 2.5rem;
+    cursor: pointer;
+    color: rgba(255, 255, 255, 0.4);
+    transition: all .3s ease-in-out;
+}
+
+.btn-scroll:hover {
+    color: rgba(97, 97, 97, 1);
+    transform: translateY(-3px);
+}
+
+.list-admin {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2em;
+}
+
+.card-admin {
+    text-align: center;
+}
+
+.card-admin-img img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+}

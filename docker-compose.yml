@@ -3,7 +3,7 @@ version: "3.9"
 services:
     db:
         image: mysql
-        container_name: dataBase
+        container_name: db_php
         restart: on-failure
         volumes:
             - db-data:/var/lib/mysql
@@ -12,23 +12,23 @@ services:
 
     phpmyadmin:
         image: phpmyadmin
-        container_name: phpMyAdmin
+        container_name: phpMyAdmin_cours_php
         restart: on-failure
         depends_on:
             - db
         ports:
-            - 8000:80
+            - 8005:80
         environment:
             PMA_HOST: db
 
     web:
         build: php
-        container_name: cours_php
         restart: on-failure
+        container_name: cours_php
         volumes:
             - ./app:/app:rw
         ports:
-            - 8080:80
+            - 8085:80
 
 volumes:
-    db-data:
+    db-data: null

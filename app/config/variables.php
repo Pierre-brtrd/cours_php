@@ -1,8 +1,10 @@
 <?php
 
-$rootURL = 'http://' . $_SERVER['HTTP_HOST'];
-$templatePath = '/app/templates/';
+$rootUrl = "http://" . $_SERVER['HTTP_HOST'];
+$adminURL = $rootUrl . 'admin';
+$templatePath = "/app/templates/";
 $stylePath = '/assets/styles/';
-$uploadPath = '/uploads/';
-$uploadUrl = '/app/uploads/';
+$jsPath = '/assets/js';
+$uploadDir = '/app/uploads/';
 $imagePath = '/assets/images/';
+$rootPath = '/app/';

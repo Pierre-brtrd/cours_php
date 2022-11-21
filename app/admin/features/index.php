@@ -1,10 +1,16 @@
 <?php
 session_start();
 
-include_once('../../config/mysql.php');
-include_once('../../config/variables.php');
-include_once('../../requetes/users.php');
-include_once('../../requetes/features.php');
+include('/app/config/variables.php');
+include($rootPath . 'requests/features.php');
+
+if (!isset($_SESSION['LOGGED_USER']) || !in_array('ROLE_ADMIN', $_SESSION['LOGGED_USER']['roles'])) {
+    $_SESSION['redirect'] = $_SERVER['PHP_SELF'];
+
+    header("Location:$rootUrl/login.php", false);
+}
+
+$_SESSION['token'] = bin2hex(random_bytes(35));
 
 ?>
 
@@ -15,51 +21,41 @@ include_once('../../requetes/features.php');
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="<?php echo $stylePath; ?>main.css">
-    <link rel="stylesheet" href="<?php echo $stylePath; ?>index.css">
+    <link rel="stylesheet" href="<? echo $stylePath; ?>main.css">
+    <link rel="stylesheet" href="<? echo $stylePath; ?>features.css">
     <link rel="shortcut icon" href="/assets/favicon/favicon.ico" type="image/x-icon">
-    <title>Liste features - Cours PHP</title>
+    <title>Admin features - Cours PHP</title>
 </head>
 
 <body>
-
-    <?php include($templatePath . 'header.php'); ?>
-
-    <?php include($templatePath . 'login.php'); ?>
-
+    <? include($templatePath . 'header.php') ?>
     <main>
-
-        <? if (isset($_SESSION['LOGGED_USER'])) : ?>
-            <section>
-                <h1>Liste des features</h1>
-                <hr class="separator middle" />
-                <div class="liste-users liste-users-admin">
-                    <? foreach ($features as $feature) : ?>
-                        <div class="card">
-                            <? if (!empty($feature['feature_image'])) : ?>
-                                <img src="<? echo $uploadPath . $feature['feature_image']; ?>" alt="">
-                            <? endif; ?>
-                            <div class="card-body">
-                                <h5 class="card-title"><?php echo $feature['feature_name']; ?></h5>
-                                <p class="card-text"><b>Description</b> : <?php echo strip_tags($feature['feature_desc']); ?></p>
-                            </div>
+        <section>
+            <h1>Admin des features</h1>
+            <a href="<?= "$rootUrl/admin/features/create.php"; ?>" class="btn btn-primary">Ajouter une feature</a>
+            <div class="list-features mt-2">
+                <? foreach (findAllFeatures() as $feature) : ?>
+                    <div class="card card-features">
+                        <? if (!empty($feature['image'])) : ?>
+                            <img src="/uploads/features/<?= $feature['image']; ?>" alt="<?= $feature['name']; ?>">
+                        <? endif; ?>
+                        <div class="card-body">
+                            <h2 class="card-text"><? echo $feature['name'] ?></h2>
                             <div class="card-btn">
-                                <a class="alert-success" href="<?php echo $rootURL . "/admin/features/update-feature.php?id=" . $feature['id']; ?>">Modifier</a>
-                                <a class="alert-danger" href="<?php echo $rootURL . "/admin/features/delete-feature.php?id=" . $feature['id']; ?>">Supprimer</a>
+                                <a href="<?= "$rootUrl/admin/features/update.php?id=" . $feature['id']; ?>" class="btn btn-success">Modifier</a>
+                                <form action="<?= "$rootUrl/admin/features/delete.php"; ?>" method="POST" onsubmit="return confirm('Êtes-vous sur de vouloir supprimer ce user')">
+                                    <input type="hidden" name="id" value="<?= $feature['id']; ?>">
+                                    <input type="hidden" name="token" value="<?= $_SESSION['token']; ?>">
+                                    <button class="btn btn-danger">Supprimer</button>
+                                </form>
                             </div>
                         </div>
-                    <? endforeach; ?>
-                </div>
-            </section>
-
-            <section>
-                <a class="btn-form" href="<?php echo $rootURL; ?>/admin/features/add-feature.php">Ajouter une feature</a>
-            </section>
-
-        <? endif; ?>
+                    </div>
+                <? endforeach; ?>
+            </div>
+        </section>
     </main>
-
-    <?php include($templatePath . 'footer.php'); ?>
+    <? include($templatePath . 'footer.php'); ?>
 
 </body>
 
