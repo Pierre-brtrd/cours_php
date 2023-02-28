@@ -30,9 +30,7 @@ $_SESSION['token'] = bin2hex(random_bytes(35));
 </head>
 
 <body>
-
     <?php include_once($templatePath . 'header.php'); ?>
-
     <main>
         <section>
             <h1>Administration des utillisateurs</h1>

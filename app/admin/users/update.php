@@ -5,6 +5,7 @@ session_start();
 include_once('/app/config/variables.php');
 include_once($rootPath . 'config/mysql.php');
 include_once($rootPath . 'requests/users.php');
+include_once($rootPath . 'utils/utils.php');
 
 if (!isset($_SESSION['LOGGED_USER']) || !in_array('ROLE_ADMIN', $_SESSION['LOGGED_USER']['roles'])) {
     $_SESSION['redirect'] = $_SERVER['REQUEST_URI'];
@@ -36,37 +37,18 @@ if (
         $prenom = filter_input(INPUT_POST, 'prenom', FILTER_SANITIZE_SPECIAL_CHARS);
         $roles = $_POST['roles'];
 
-        // On vérifie s'il y a une image d'upload et qu'il n'y a pas d'erreur
         if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
-            // On vérifie la taille du fichier
-            if ($_FILES['image']['size'] <= 8000000) {
-                // On vérifie l'extension du fichier
-                $fileInfo = pathinfo($_FILES['image']['name']);
-                $extension = $fileInfo['extension'];
-                $extensionAllowed = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+            $statusImage = addImage('users', $user, true);
 
-                if (in_array($extension, $extensionAllowed)) {
-                    // Déplacer le fichier dans le bon dossier
-                    $imageUploadName = str_replace(' ', '-', $fileInfo['filename']) . (new DateTime())->format('Y-m-d_H:i:s') . '.' . $fileInfo['extension'];
-
-                    if ($user['image']) {
-                        $imagePath = "/app/uploads/users/$user[image]";
-                        if (file_exists($imagePath)) {
-                            unlink($imagePath);
-                        }
-                    }
-
-                    move_uploaded_file($_FILES['image']['tmp_name'], '/app/uploads/users/' . $imageUploadName);
-                } else {
-                    $errorMessage = 'Fichier invalide, veuillez télécharger un fichier de type image';
-                }
+            if ($statusImage) {
+                $imageUploadName = $statusImage;
             } else {
-                $errorMessage = "Fichier trop volumineux, la limite est de 8M";
+                $errorMessage = 'Une erreur est survenue lors du chargement de l\'image';
             }
         }
 
         if (!isset($errorMessage)) {
-            if (updateUser($user['id'], $nom, $prenom, $email, $roles, isset($imageUploadName) ? $imageUploadName : null)) {
+            if (updateUser($user['id'], $nom, $prenom, $email, $roles, isset($imageUploadName) ? $imageUploadName : $_POST['delete-img'])) {
                 $_SESSION['message']['success'] = 'User updated successfully.';
 
                 header("Location:$rootUrl/admin/users");
@@ -111,11 +93,13 @@ if (
                 <?php endif; ?>
                 <form action="<?= $_SERVER['REQUEST_URI']; ?>" method="POST" enctype="multipart/form-data">
                     <?php if (!empty($user['image'])) : ?>
-                        <div class="form-row">
+                        <div class="form-row mb-2">
                             <div class="form-img">
                                 <img src="/uploads/users/<?= $user['image'] ?>" alt="<?= "$user[prenom] $user[nom]"; ?>">
                             </div>
                         </div>
+                        <input type="checkbox" name="delete-img">
+                        <label for="delete-img">Suprimer image ?</label>
                     <?php endif; ?>
                     <div class="form-row">
                         <div class="input-group">

@@ -32,6 +32,7 @@ $_SESSION['token'] = bin2hex(random_bytes(35));
     <main>
         <section>
             <h1>Admin des features</h1>
+            <?php include_once($templatePath . 'messages.php'); ?>
             <a href="<?= "$rootUrl/admin/features/create.php"; ?>" class="btn btn-primary">Ajouter une feature</a>
             <div class="list-features mt-2">
                 <? foreach (findAllFeatures() as $feature) : ?>

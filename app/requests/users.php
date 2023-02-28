@@ -131,7 +131,7 @@ function updateUser(int $id, string $nom, string $prenom, string $email, array $
                 'prenom' => $prenom,
                 'email' => $email,
                 'roles' => json_encode($roles),
-                'image' => $image,
+                'image' => ($image !== 'on') ? $image : null,
             ]);
         } else {
             $query = "UPDATE users SET nom= :nom, prenom= :prenom, email= :email, roles= :roles WHERE id= :id";

@@ -2,7 +2,7 @@
 
 try {
     $db = new PDO(
-        'mysql:host=db_php;dbname=data_site;charset=utf8',
+        'mysql:host=cours_php-db-1;dbname=data_site;charset=utf8',
         'root',
         '',
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION],

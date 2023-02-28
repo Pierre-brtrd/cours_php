@@ -3,6 +3,7 @@ session_start();
 
 include_once('/app/config/variables.php');
 include_once($rootPath . 'requests/articles.php');
+include_once($rootPath . '/utils/utils.php');
 
 if (!isset($_SESSION['LOGGED_USER']) || !in_array('ROLE_ADMIN', $_SESSION['LOGGED_USER']['roles'])) {
     $_SESSION['redirect'] = $_SERVER['PHP_SELF'];
@@ -23,34 +24,22 @@ if (
         $titre = filter_input(INPUT_POST, 'titre', FILTER_SANITIZE_SPECIAL_CHARS);
         $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_SPECIAL_CHARS);
 
-        // On vérifie s'il y a une image d'upload et qu'il n'y a pas d'erreur
         if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
-            // On vérifie la taille du fichier
-            if ($_FILES['image']['size'] <= 8000000) {
-                // On vérifie l'extension du fichier
-                $fileInfo = pathinfo($_FILES['image']['name']);
-                $extension = $fileInfo['extension'];
-                $extensionAllowed = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+            $statusImage = addImage('articles');
 
-                if (in_array($extension, $extensionAllowed)) {
-                    // Déplacer le fichier dans le bon dossier
-                    $imageUploadName = str_replace(' ', '-', $fileInfo['filename']) . (new DateTime())->format('Y-m-d_H:i:s') . '.' . $fileInfo['extension'];
-
-                    move_uploaded_file($_FILES['image']['tmp_name'], '/app/uploads/articles/' . $imageUploadName);
-                } else {
-                    $errorMessage = 'Fichier invalide, veuillez télécharger un fichier de type image';
-                }
+            if ($statusImage) {
+                $imageUploadName = $statusImage;
             } else {
-                $errorMessage = "Fichier trop volumineux, la limite est de 8M";
+                $errorMessage = 'Une erreur est survenue lors du chargement de l\'image';
             }
         }
 
-        if (addArticle($titre, $description, date('Y-m-d'), $_SESSION['LOGGED_USER']['id'], isset($imageUploadName) ? $imageUploadName : null)) {
+        if (!isset($errorMessage) && addArticle($titre, $description, date('Y-m-d'), $_SESSION['LOGGED_USER']['id'], isset($imageUploadName) ? $imageUploadName : null)) {
             $_SESSION['message']['success'] = "Article created successfully";
 
             header("Location:$rootUrl/admin/articles");
         } else {
-            $errorMessage = "Une erreur est survenue, veuillez réessayer";
+            $errorMessage = isset($errorMessage) ? $errorMessage : "Une erreur est survenue, veuillez réessayer";
         }
     }
 } else {

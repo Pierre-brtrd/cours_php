@@ -4,6 +4,7 @@ session_start();
 include_once('/app/config/variables.php');
 include_once($rootPath . 'config/mysql.php');
 include_once($rootPath . 'requests/features.php');
+include_once($rootPath . '/utils/utils.php');
 
 if (!isset($_SESSION['LOGGED_USER']) || !in_array('ROLE_ADMIN', $_SESSION['LOGGED_USER']['roles'])) {
     $_SESSION['redirect'] = $_SERVER['REQUEST_URI'];
@@ -29,29 +30,17 @@ if (
     } else {
         $titre = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_SPECIAL_CHARS);
 
-        // On vérifie s'il y a une image d'upload et qu'il n'y a pas d'erreur
         if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
-            // On vérifie la taille du fichier
-            if ($_FILES['image']['size'] <= 8000000) {
-                // On vérifie l'extension du fichier
-                $fileInfo = pathinfo($_FILES['image']['name']);
-                $extension = $fileInfo['extension'];
-                $extensionAllowed = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+            $statusImage = addImage('features', $feature, true);
 
-                if (in_array($extension, $extensionAllowed)) {
-                    // Déplacer le fichier dans le bon dossier
-                    $imageUploadName = str_replace(' ', '-', $fileInfo['filename']) . (new DateTime())->format('Y-m-d_H:i:s') . '.' . $fileInfo['extension'];
-
-                    move_uploaded_file($_FILES['image']['tmp_name'], '/app/uploads/features/' . $imageUploadName);
-                } else {
-                    $errorMessage = 'Fichier invalide, veuillez télécharger un fichier de type image';
-                }
+            if ($statusImage) {
+                $imageUploadName = $statusImage;
             } else {
-                $errorMessage = "Fichier trop volumineux, la limite est de 8M";
+                $errorMessage = 'Une erreur est survenue lors du chargement de l\'image';
             }
         }
 
-        if (updateFeature($feature['id'], $titre, isset($imageUploadName) ? $imageUploadName : null)) {
+        if (!isset($errorMessage) && updateFeature($feature['id'], $titre, isset($imageUploadName) ? $imageUploadName : $_POST['delete-img'])) {
             $_SESSION['message']['success'] = "Feature updated successfully";
 
             header("Location:$rootUrl/admin/features");

@@ -3,7 +3,6 @@ version: "3.9"
 services:
     db:
         image: mysql
-        container_name: db_php
         restart: on-failure
         volumes:
             - db-data:/var/lib/mysql
@@ -12,7 +11,6 @@ services:
 
     phpmyadmin:
         image: phpmyadmin
-        container_name: phpMyAdmin_cours_php
         restart: on-failure
         depends_on:
             - db
@@ -24,7 +22,6 @@ services:
     web:
         build: php
         restart: on-failure
-        container_name: cours_php
         volumes:
             - ./app:/app:rw
         ports:
