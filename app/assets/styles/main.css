@@ -7,7 +7,8 @@
     --primary: #95D1CC;
     --secondary: #22577E;
     --terciary: #F6F2D4;
-    --box-shadow: 1px 1px 40px -15px rgba(0, 0, 0, 0.7);
+    --box-shadow: 15px 15px 30px #bebebe,
+                -15px -15px 30px #ffffff;
     --border-radius: 8px;
 }
 

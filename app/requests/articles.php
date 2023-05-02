@@ -31,6 +31,39 @@ function findAllArticlesWithUser(): array|bool
     return $sqlStatement->fetchAll();
 }
 
+function countArticles(): array|bool
+{
+    global $db;
+
+    $query = "SELECT COUNT(id) AS total FROM articles";
+    $sqlStatement = $db->prepare($query);
+    $sqlStatement->execute();
+
+    return $sqlStatement->fetch();
+}
+
+function paginationArticlesWithAuthor(int $maxPerPage, int $page = 1): array|bool
+{
+    global $db;
+
+    $nbrArticles = countArticles();
+    $nbrPages = ceil($nbrArticles['total'] / $maxPerPage);
+
+    $start = ($page - 1) * $maxPerPage;
+
+    $query = "SELECT a.id, a.titre, a.description, a.image, a.date, u.prenom, u.nom, u.email, u.image AS avatar FROM articles a JOIN users u ON a.user_id = u.id LIMIT :start, :maxPerPage";
+    $sqlStatement = $db->prepare($query);
+    $sqlStatement->execute([
+        'start' => $start,
+        'maxPerPage' => $maxPerPage
+    ]);
+
+    return [
+        'data' => $sqlStatement->fetchAll(),
+        'pages' => $nbrPages
+    ];
+}
+
 function findArticleById(int $id): array|bool
 {
     global $db;

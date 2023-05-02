@@ -3219,15 +3219,13 @@ RIGHT JOIN articles a
 ON u.user_id = a.user_id
 ```
 
-
-
 ## L'architecture MCV
 
 L'architecture MCV est très importante quand vous développez en PHP, c'est aussi à ça qu'on reconnait un bon développeur PHP.
 
 En PHP, il y a certains bug qui surviennent tellement souvent, qu'on a mis en place une série de bonnes pratiques pour les éviter, c'est ce qu'on appelle les design patterns.
 
-Un des plus célèbre Design Pattern est le MCV, vous devez appliquer ce Design Pattern pour vous projet en PHP.
+Un des plus célèbre Design Pattern est le MCV, vous devez appliquer ce Design Pattern pour vos projet en PHP.
 
 MCV pour __Model__, __Controlleur__ et __Vue__, qui définit que chaque partie à son importance : 
 
@@ -3254,3 +3252,4 @@ Une fois les données récupérées, le contrôleur les transmet à la vue qui s
 Concrètement, le visiteur demandera la page au contrôleur et c'est la vue qui lui sera retournée, comme schématisé sur la figure suivante. Bien entendu, tout cela est transparent pour lui, il ne voit pas tout ce qui se passe sur le serveur. C'est un schéma plus complexe que ce à quoi vous avez été habitués, bien évidemment : c'est pourtant sur ce type d'architecture que repose un grand nombre de sites professionnels !
 
 ![La requête du client arrive au contrôleur et celui-ci lui retourne la vue](https://user.oc-static.com/files/382001_383000/382129.png)
+

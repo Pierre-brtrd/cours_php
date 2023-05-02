@@ -14,6 +14,19 @@ function findAllFeatures(): array
     return $sqlStatement->fetchAll();
 }
 
+function findFeaturesOrderByDateWithLimit(int $max = 6): array|bool
+{
+    global $db;
+
+    $query = "SELECT * FROM features ORDER BY name LIMIT :max";
+    $sqlStatement = $db->prepare($query);
+    $sqlStatement->execute([
+        'max' => $max,
+    ]);
+
+    return $sqlStatement->fetchAll();
+}
+
 function findFeatureById(int $id): array|bool
 {
     global $db;

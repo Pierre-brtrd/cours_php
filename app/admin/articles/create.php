@@ -22,7 +22,7 @@ if (
         $errorMessage = "Une erreur est survenue, token invalid";
     } else {
         $titre = filter_input(INPUT_POST, 'titre', FILTER_SANITIZE_SPECIAL_CHARS);
-        $description = filter_input(INPUT_POST, 'description', FILTER_SANITIZE_SPECIAL_CHARS);
+        $description = htmlspecialchars($_POST['description']);
 
         if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
             $statusImage = addImage('articles');

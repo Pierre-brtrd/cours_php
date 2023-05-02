@@ -36,7 +36,7 @@ include($rootPath . 'requests/features.php');
                 <hr class="separator tier">
                 <p>Voici la liste des features de l'application</p>
                 <div class="list-features">
-                    <? foreach (findAllFeatures() as $feature) : ?>
+                    <? foreach (findFeaturesOrderByDateWithLimit(3) as $feature) : ?>
                         <div class="card card-features">
                             <? if (!empty($feature['image'])) : ?>
                                 <img src="/uploads/features/<?= $feature['image']; ?>" alt="<?= $feature['name']; ?>">
@@ -79,7 +79,7 @@ include($rootPath . 'requests/features.php');
                                             <?= $article['prenom']; ?>
                                         </em>
                                     </div>
-                                    <p>Date : <?= $article['date']; ?></p>
+                                    <p>Date : <?= date_format(new Datetime($article['date']), 'd/m/Y'); ?></p>
                                     <p class="card-text"><b>Description</b> : <?= strip_tags(html_entity_decode($description)); ?></p>
                                     <form action="<?= "$rootUrl/article.php"; ?>" method="POST">
                                         <input type="hidden" name="id" value="<?= $article['id']; ?>">
